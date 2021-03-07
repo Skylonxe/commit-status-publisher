@@ -52,6 +52,9 @@
   <!-- tfs -->
   <bean class="jetbrains.buildServer.commitPublisher.tfs.TfsPublisherSettings"/>
 
+  <!-- ugs -->
+  <bean class="jetbrains.buildServer.commitPublisher.ugs.UgsPublisherSettings"/>
+
   <!-- space -->
   <bean class="jetbrains.buildServer.commitPublisher.space.SpaceSettings"/>
 

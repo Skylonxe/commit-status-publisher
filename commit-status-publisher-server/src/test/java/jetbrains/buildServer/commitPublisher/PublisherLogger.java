@@ -32,47 +32,47 @@ class PublisherLogger extends Logger {
     return entries.pop();
   }
 
-  @Override
+  //@Override
   public boolean isDebugEnabled() {
     return false;
   }
 
-  @Override
+  //@Override
   public boolean isTraceEnabled() {
     return false;
   }
 
-  @Override
+  //@Override
   public void debug(@NonNls final String message) {
     entries.push("DEBUG: " + message);
   }
 
-  @Override
+  //@Override
   public void debug(@NonNls final String message, final Throwable t) {
     debug(message);
   }
 
-  @Override
+  //@Override
   public void error(@NonNls final String message, final Throwable t, @NonNls final String... details) {
     entries.push("ERROR: " + message);
   }
 
-  @Override
+  //@Override
   public void info(@NonNls final String message) {
     entries.push("INFO: " + message);
   }
 
-  @Override
+  //@Override
   public void info(@NonNls final String message, final Throwable t) {
     info(message);
   }
 
-  @Override
+  //@Override
   public void warn(@NonNls final String message, final Throwable t) {
     entries.push("WARN: " + message);
   }
 
-  @Override
+  //@Override
   public void setLevel(final Level level) {
   }
 }

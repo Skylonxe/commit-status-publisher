@@ -16,13 +16,13 @@
 
 ext {
   pluginVersion = project.hasProperty("PluginVersion") ? "$PluginVersion"
-                                                         : "SNAPSHOT"
+                                                         : "2020.2.2-SNAPSHOT"
   teamcityVersion = project.hasProperty("TeamCityVersion") ? "$TeamCityVersion"
-                                                           : "SNAPSHOT"
+                                                           : "2020.2.2-SNAPSHOT"
   teamcityLibs = project.hasProperty("TeamCityLibs") ? "$TeamCityLibs"
-      : "../../../.idea_artifacts/web-deployment/WEB-INF/lib"
+      : "E:/Servers/TeamCity/PluginDev/webapps/ROOT/WEB-INF/lib"
   teamcityTestLibs = project.hasProperty("TeamCityTestLibs") ? "$TeamCityTestLibs"
-      : "../../../.idea_artifacts/dist_openapi_integration/tests"
+      : "E:/Servers/TeamCity/PluginDev/devPackage/tests"
 }
 
 allprojects {

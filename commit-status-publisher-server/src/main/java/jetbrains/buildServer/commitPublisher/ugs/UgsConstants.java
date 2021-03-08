@@ -26,6 +26,7 @@ public class UgsConstants {
   public static final String PROJECT = "ugsProject";
   public static final String SERVER_URL = "ugsServerUrl";
   public static final String BADGE_LINK = "ugsBadgeLink";
+  public static final String POST_BADGE_STATUS_EXE = "ugsPostBadgeStatusExe";
 
   public String getBadgeName() {  return BADGE_NAME; }
 
@@ -42,4 +43,6 @@ public class UgsConstants {
   }
 
   public String getBadgeLink() { return BADGE_LINK; }
+
+  public String getPostBadgeStatusExe() { return POST_BADGE_STATUS_EXE; }
 }

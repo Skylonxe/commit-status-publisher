@@ -20,7 +20,7 @@ ext {
   teamcityVersion = project.hasProperty("TeamCityVersion") ? "$TeamCityVersion"
                                                            : "2020.2.2-SNAPSHOT"
   teamcityLibs = project.hasProperty("TeamCityLibs") ? "$TeamCityLibs"
-      : "E:/Servers/TeamCity/PluginDev/webapps/ROOT/WEB-INF/lib"
+      : "E:/Servers/TeamCity/PluginDev/devPackage"
   teamcityTestLibs = project.hasProperty("TeamCityTestLibs") ? "$TeamCityTestLibs"
       : "E:/Servers/TeamCity/PluginDev/devPackage/tests"
 }

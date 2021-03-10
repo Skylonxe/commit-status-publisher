@@ -1,22 +1,6 @@
-/*
- * Copyright 2000-2021 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright Ondrej Hrusovsky
 
 package jetbrains.buildServer.commitPublisher.ugs;
-
-import jetbrains.buildServer.agent.Constants;
 
 public class UgsConstants {
   public static final String ID = "ugs";
@@ -27,6 +11,14 @@ public class UgsConstants {
   public static final String SERVER_URL = "ugsServerUrl";
   public static final String BADGE_LINK = "ugsBadgeLink";
   public static final String POST_BADGE_STATUS_EXE = "ugsPostBadgeStatusExe";
+  public static final String INTERRUPTED_ACTION = "ugsInterruptedAction";
+  public static final String POST_RESULT_AS_SOON_AS_POSSIBLE = "ugsPostResultAsSoonAsPossible";
+  public static final String POST_WHEN_QUEUED = "ugsPostWhenQueued";
+
+  public static final String INTERRUPTED_ACTION_NOTHING = "ugsInterruptedActionNothing";
+  public static final String INTERRUPTED_ACTION_FAIL = "ugsInterruptedActionFail";
+  public static final String INTERRUPTED_ACTION_WARNING = "ugsInterruptedActionWarning";
+  public static final String INTERRUPTED_ACTION_SUCCESS = "ugsInterruptedActionSuccess";
 
   public String getBadgeName() {  return BADGE_NAME; }
 
@@ -45,4 +37,18 @@ public class UgsConstants {
   public String getBadgeLink() { return BADGE_LINK; }
 
   public String getPostBadgeStatusExe() { return POST_BADGE_STATUS_EXE; }
+
+  public String getInterruptedAction() { return INTERRUPTED_ACTION; }
+
+  public String getPostResultAsSoonAsPossible() { return POST_RESULT_AS_SOON_AS_POSSIBLE; }
+
+  public String getPostWhenQueued() { return POST_WHEN_QUEUED; }
+
+  public String  getInterruptedActionNothing() { return INTERRUPTED_ACTION_NOTHING; }
+
+  public String  getInterruptedActionFail() { return INTERRUPTED_ACTION_FAIL; }
+
+  public String  getInterruptedActionWarning() { return INTERRUPTED_ACTION_WARNING; }
+
+  public String  getInterruptedActionSuccess() { return INTERRUPTED_ACTION_SUCCESS; }
 }

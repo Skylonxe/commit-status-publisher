@@ -25,7 +25,7 @@
     <props:textProperty name="${keys.badgeName}" className="longField"/>
     <span class="error" id="error_${keys.badgeName}"></span>
     <span class="smallNote">
-      The badge name that will appear in UGS user interface. For example: Win64
+      The badge name that will appear in UGS user interface. For example: Win
     </span>
   </td>
 </tr>
@@ -70,6 +70,45 @@
     <span class="error" id="error_${keys.badgeLink}"></span>
     <span class="smallNote">
       If a user clicks on a badge, this is the link that takes the user to the build log. Use &#60buildId&#62 to insert current build id. For example: http://link-to-build-log/&#60buildId&#62
+    </span>
+  </td>
+</tr>
+
+<tr class="advancedSetting">
+  <th><label for="${keys.postResultAsSoonAsPossible}">Post as Soon as Possible:<l:star/></label></th>
+  <td>
+    <props:checkboxProperty name="${keys.postResultAsSoonAsPossible}"/>
+    <span class="error" id="error_${keys.postResultAsSoonAsPossible}"></span>
+    <span class="smallNote">
+      If enabled, badge showing resulting status of the build can be in some cases posted even before finishing the build when we detected the build will fail/succeed.
+    </span>
+  </td>
+</tr>
+
+<tr class="advancedSetting">
+  <th><label for="${keys.postWhenQueued}">Post when Queued:<l:star/></label></th>
+  <td>
+    <props:checkboxProperty name="${keys.postWhenQueued}"/>
+    <span class="error" id="error_${keys.postWhenQueued}"></span>
+    <span class="smallNote">
+      Starting badge will be posted as soon as the build is added to the build queue. When build is removed from the queue, Starting badge will remain.
+    </span>
+  </td>
+</tr>
+
+<tr class="advancedSetting">
+  <th><label for="${keys.interruptedAction}">When Interrupted:<l:star/></label></th>
+  <td>
+    <props:selectProperty name="${keys.interruptedAction}" className="mediumField">
+        <c:set var="modeSelected" value="${propertiesBean.properties[keys.interruptedAction]}"/>
+        <props:option value="${keys.interruptedActionNothing}" currValue="${modeSelected}">Do nothing</props:option>
+        <props:option value="${keys.interruptedActionFail}" currValue="${modeSelected}">Fail</props:option>
+        <props:option value="${keys.interruptedActionWarning}" currValue="${modeSelected}">Warn</props:option>
+        <props:option value="${keys.interruptedActionSuccess}" currValue="${modeSelected}">Succeed</props:option>
+    </props:selectProperty>
+    <span class="error" id="error_${keys.interruptedAction}"></span>
+    <span class="smallNote">
+      What to post when build is canceled.
     </span>
   </td>
 </tr>

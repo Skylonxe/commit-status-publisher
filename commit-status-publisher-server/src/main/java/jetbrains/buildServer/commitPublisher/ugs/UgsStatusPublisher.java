@@ -1,36 +1,17 @@
-/*
- * Copyright 2000-2021 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright Ondrej Hrusovsky
 
 package jetbrains.buildServer.commitPublisher.ugs;
 
-import jetbrains.buildServer.BuildProblemData;
 import jetbrains.buildServer.commitPublisher.*;
 import jetbrains.buildServer.messages.Status;
 import jetbrains.buildServer.serverSide.*;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import static jetbrains.buildServer.commitPublisher.LoggerUtil.LOG;
 
 /**
  * Updates UGS commit statuses via PostBadgeStatus.exe
@@ -43,22 +24,19 @@ class UgsStatusPublisher extends BaseCommitStatusPublisher {
     super(settings, buildType, buildFeatureId, params, problems);
   }
 
-  private void runPostBadgeStatus(SBuild build, String status, String change) throws PublisherException
+  private void runPostBadgeStatus(long buildId, String status, String change) throws PublisherException
   {
     final String changeStr = myParams.getOrDefault(UgsConstants.CHANGE, "<current>").equals("<current>") ? change : myParams.get(UgsConstants.CHANGE);
-    final String urlStr = myParams.get(UgsConstants.BADGE_LINK).replace("<buildId>", String.valueOf(build.getBuildId()));
+    final String urlStr = myParams.get(UgsConstants.BADGE_LINK).replace("<buildId>", String.valueOf(buildId));
 
     final String cmd = MessageFormat.format("{0} -Name={1} -Change={2} -Project={3} -RestUrl={4} -Status={5} -Url={6}",
       myParams.get(UgsConstants.POST_BADGE_STATUS_EXE),
       myParams.get(UgsConstants.BADGE_NAME), changeStr, myParams.get(UgsConstants.PROJECT), myParams.get(UgsConstants.SERVER_URL), status, urlStr);
 
-    LOG.debug(cmd);
-    System.out.println(cmd);
+    //System.out.println(cmd);
 
     Runtime rt = Runtime.getRuntime();
     try {
-      //build.getBuildLog().message("Posting " + status + " badge to the Unreal Game Sync metadata server", Status.NORMAL, MessageAttrs.serverMessage());
-
       Process pr = rt.exec(cmd);
       pr.waitFor(10, TimeUnit.SECONDS);
       if(pr.exitValue() != 0)
@@ -72,6 +50,15 @@ class UgsStatusPublisher extends BaseCommitStatusPublisher {
     }
   }
 
+  private static String interruptedActionToStatus(String action)
+  {
+    if(action.equals(UgsConstants.INTERRUPTED_ACTION_NOTHING)) return "";
+    if(action.equals(UgsConstants.INTERRUPTED_ACTION_FAIL)) return "Failure";
+    if(action.equals(UgsConstants.INTERRUPTED_ACTION_WARNING)) return "Warning";
+    if(action.equals(UgsConstants.INTERRUPTED_ACTION_SUCCESS)) return "Success";
+    return "";
+  }
+
   private static String getStatus(boolean isStarting, Status status) {
     if (!isStarting) {
       if (status.isSuccessful()) return "Success";
@@ -82,27 +69,47 @@ class UgsStatusPublisher extends BaseCommitStatusPublisher {
     return "Starting";
   }
 
+  public boolean buildQueued(@NotNull SQueuedBuild build, @NotNull BuildRevision revision) throws PublisherException {
+    if(myParams.getOrDefault(UgsConstants.POST_WHEN_QUEUED, "").equals("true"))
+    {
+      runPostBadgeStatus(build.getBuildPromotion().getId(), "Starting", revision.getRepositoryVersion().getVersion());
+    }
+    return true;
+  }
+
   public boolean buildStarted(@NotNull SBuild build, @NotNull BuildRevision revision) throws PublisherException {
-    runPostBadgeStatus(build, "Starting", revision.getRepositoryVersion().getVersion());
-    return false;
+    runPostBadgeStatus(build.getBuildId(), "Starting", revision.getRepositoryVersion().getVersion());
+    return true;
   }
 
   @Override
   public boolean buildFinished(@NotNull SBuild build, @NotNull BuildRevision revision) throws PublisherException {
     final String status = getStatus(false, build.getBuildStatus());
-    runPostBadgeStatus(build, status, revision.getRevision());
+    runPostBadgeStatus(build.getBuildId(), status, revision.getRevision());
     return true;
   }
 
+  public boolean buildInterrupted(@NotNull SBuild build, @NotNull BuildRevision revision) throws PublisherException {
+    final String status = interruptedActionToStatus(myParams.getOrDefault(UgsConstants.INTERRUPTED_ACTION, ""));
+    if(!status.isEmpty())
+    {
+      runPostBadgeStatus(build.getBuildPromotion().getId(), status, revision.getRepositoryVersion().getVersion());
+    }
+    return true;
+  }
 
   public boolean buildFailureDetected(@NotNull SBuild build, @NotNull BuildRevision revision) throws PublisherException {
-    runPostBadgeStatus(build, "Failure", revision.getRevision());
-    return false;
+    if(myParams.getOrDefault(UgsConstants.POST_RESULT_AS_SOON_AS_POSSIBLE, "").equals("true")) {
+      runPostBadgeStatus(build.getBuildId(), "Failure", revision.getRevision());
+    }
+    return true;
   }
 
   public boolean buildMarkedAsSuccessful(@NotNull SBuild build, @NotNull BuildRevision revision, boolean buildInProgress) throws PublisherException {
-    runPostBadgeStatus(build, "Success", revision.getRevision());
-    return false;
+    if(myParams.getOrDefault(UgsConstants.POST_RESULT_AS_SOON_AS_POSSIBLE, "").equals("true")) {
+      runPostBadgeStatus(build.getBuildId(), "Success", revision.getRevision());
+    }
+    return true;
   }
 
   @Override

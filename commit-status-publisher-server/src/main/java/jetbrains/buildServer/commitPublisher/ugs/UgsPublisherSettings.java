@@ -1,50 +1,29 @@
-/*
- * Copyright 2000-2021 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright Ondrej Hrusovsky
 
 package jetbrains.buildServer.commitPublisher.ugs;
 
 import jetbrains.buildServer.commitPublisher.*;
 import jetbrains.buildServer.commitPublisher.CommitStatusPublisher.Event;
-import jetbrains.buildServer.commitPublisher.tfs.TfsConstants;
 import jetbrains.buildServer.serverSide.*;
-import jetbrains.buildServer.serverSide.auth.SecurityContext;
-import jetbrains.buildServer.serverSide.oauth.*;
-import jetbrains.buildServer.serverSide.oauth.tfs.TfsAuthProvider;
-import jetbrains.buildServer.users.SUser;
-import jetbrains.buildServer.users.User;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.util.ssl.SSLTrustStoreProvider;
-import jetbrains.buildServer.vcs.*;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static jetbrains.buildServer.commitPublisher.LoggerUtil.LOG;
-
 /**
  * Settings for UGS commit status publisher.
  */
 public class UgsPublisherSettings extends BasePublisherSettings implements CommitStatusPublisherSettings {
   private static final Set<Event> mySupportedEvents = new HashSet<Event>() {{
+    add(Event.QUEUED);
     add(Event.STARTED);
     add(Event.FINISHED);
-    add(Event.FAILURE_DETECTED);
     add(Event.MARKED_AS_SUCCESSFUL);
+    add(Event.INTERRUPTED);
+    add(Event.FAILURE_DETECTED);
   }};
 
   public UgsPublisherSettings(@NotNull PluginDescriptor descriptor,
@@ -53,13 +32,6 @@ public class UgsPublisherSettings extends BasePublisherSettings implements Commi
                               @NotNull SSLTrustStoreProvider trustStoreProvider) {
     super(descriptor, links, problems, trustStoreProvider);
   }
-
-  /*@Override
-  public boolean isPublishingForVcsRoot(final VcsRoot vcsRoot) {
-    System.out.println("FALSE VCS");
-    LOG.debug("FALSE VCS");
-    return false;
-  }*/
 
   @NotNull
   public String getId() {
@@ -101,6 +73,9 @@ public class UgsPublisherSettings extends BasePublisherSettings implements Commi
     result.put(UgsConstants.PROJECT, "%env.unreal.ugs.perforceProjectPath%");
     result.put(UgsConstants.SERVER_URL, "%env.unreal.ugs.serverUrl%");
     result.put(UgsConstants.POST_BADGE_STATUS_EXE, "%env.unreal.ugs.postBadgeStatusExe%");
+    result.put(UgsConstants.INTERRUPTED_ACTION, UgsConstants.INTERRUPTED_ACTION_FAIL);
+    result.put(UgsConstants.POST_RESULT_AS_SOON_AS_POSSIBLE, "true");
+    result.put(UgsConstants.POST_WHEN_QUEUED, "false");
     return result;
   }
 
@@ -140,6 +115,7 @@ public class UgsPublisherSettings extends BasePublisherSettings implements Commi
         checkNotEmpty(p, UgsConstants.POST_BADGE_STATUS_EXE, "PostBadgeStatus.exe Path must be specified", result);
         checkNotEmpty(p, UgsConstants.CHANGE, "Change must be specified", result);
         checkNotEmpty(p, UgsConstants.BADGE_LINK, "Badge Link must be specified", result);
+        checkNotEmpty(p, UgsConstants.INTERRUPTED_ACTION, "Action must be specified", result);
 
         return result;
       }
